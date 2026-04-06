@@ -1,6 +1,6 @@
 # Arquivo: 02-importacao-manipulacao.R
-# Autor(a): <seu nome>
-# Data: <dd/mm/aaaa>
+# Autor(a): Thayná pereira Vieira
+# Data: 30-03-2026
 # Objetivos:
 # 1. Importar um arquivo csv de dados
 # 2. Preparar os dados para análise
@@ -12,10 +12,11 @@
 # Configura o número de dígitos a serem exibidos
 options(digits = 5, scipen = 999)
 
-# carrega os pacotes necessários
-library(here) # para usar caminhos relativos
-library(tidyverse) # carrega o dplyr, readr, ggplot2, etc.
-library(janitor) # para limpar os nomes das colunas
+#Carrega os pacotes necessarios 
+
+library (here) # opara usar caminhos relativos  
+library(tidyverse) #carrega o dplyr, rEADR, GGPLOT2, ETC
+library(janitor) #para limpar os nomes das colunas
 
 
 # Aquisição dos dados ----------------------------------------------------
@@ -23,13 +24,13 @@ library(janitor) # para limpar os nomes das colunas
 # define o caminho relativo do arquivo de dados
 caminho_csv <- here("dados/brutos/dados_vendas.csv")
 
-# importa o arquivo usando a função read_csv do pacote readr
-dados_vendas <- read_csv(caminho_csv)
+# importa o arquiSvo thousand a função read_csv do pacote readr
+dados_vendas <- read_csv (caminho_csv)
 
 
 # Entendimento dos dados --------------------------------------------------
 
-# exibe uma visão compacta do objeto
+# exibe uma visão compacta do objeto (quantas colunas)
 glimpse(dados_vendas)
 
 # exibe as primeiras linhas
@@ -46,7 +47,7 @@ summary(dados_vendas)
 
 # pipeline de preparação dos dados
 dados_vendas_limpos <- dados_vendas |>
-  # limpa os nomes das colunas/variáveis
+  # limpa os nomes das colunas/variáveisfs::
   clean_names() |>
   # converte as variáveis para fatores nominais
   # e cria a variável receita
@@ -59,3 +60,179 @@ dados_vendas_limpos <- dados_vendas |>
 
 # verifica a estrutura dos dados
 glimpse(dados_vendas_limpos)
+
+
+
+#salva os dados limpos em um arquivos rds para
+#análise futuras sem precisar repertir a preparação 
+#dos dados
+
+## 1. Define o caminho relativo para salavar o arquivo rds
+caminho_rds <- here ("dados/limpos/dados_vendas_limpos.rds")
+
+## 2. salva o objeto dados-vendas_limpos no formato rds
+readr::write_rds(dados_vendas_limpos, caminho_rds)
+
+
+# lendo os dados limpos em uma seção futura
+
+## 1. define o cainho relativo do arquivo rds
+caminho_rds <- here ("dados/limpos/dados_vendas_limpos.rds")
+
+## 2. lê o arquivo rfds e armazena em um objeto
+dados_vendas_limpos <- readr::read_rds(caminho_rds)
+
+
+# A função filter ---------------------------------------------------------
+
+# Filtra as vendas realizadas na cidade de "Formiga"
+dados_vendas_limpos |> 
+  filter(cidade == "Formiga")
+
+# Filtra as venbdas realizadas por um representante específico
+dados_vendas_limpos|> 
+  filter(representante == "Representante 1")
+
+# Filtra as vendas realizadas em formiga por um representante específico
+dados_vendas_limpos |> 
+  filter(cidade == "Formiga" & representante == "Representante 1")
+
+# Filtra as vendas realizadas em Formiga ou em Arcos com o operador |
+dados_vendas_limpos |> 
+  filter(cidade == "Formiga" | cidade == "Arcos")
+
+# Filtra as mesmas vendas usando %in%, uma forma mais compacta
+#para multiplas comparações da mesma variável
+dados_vendas_limpos |> 
+  filter(cidade %in% c("Formiga, Arcos"))
+
+# salva o resultado em um novo objeto
+dados_vendas_formiga_arcos <- dados_vendas_limpos |>
+  filter (cidade %in% c ("Formiga" , "Arcos"))
+
+#Exibe o resultado
+dados_vendas_formiga_arcos
+
+
+# A função select ---------------------------------------------------------
+
+# Seleciona apenas as colunas cidade, produto e receita
+dados_vendas_limpos |> 
+  select(cidade, produto, receita)
+
+# remove as colunas representante e cidade
+dados_vendas_limpos |> 
+  select(-representante, -cidade)
+
+# salvando o resultado em um novo objeto
+dados_vendas_selecionados <- dados_vendas_limpos |> 
+  select(cidade, produto, receita)
+
+#exibe o resultado
+dados_vendas_selecionados
+
+
+# A função mutate ---------------------------------------------------------
+
+# Criar a variavel preco_desconto (10% sobre o preco_unitario)
+dados_vendas_limpos |> 
+  mutate (preco_desconto = preco_unitario * 0.9)
+
+# Criar a variável receita_total
+dados_vendas_limpos |> 
+  mutate( receita_total = unidades * preco_unitario )
+
+# Cria a várivel receita total, agrupa por cidade, 
+# Calcula a receita total por cidade e ordena o resultado
+
+dados_vendas_limpos |>
+  mutate(receita_total = unidades * preco_unitario) |> 
+  group_by(cidade) |> 
+  summarise(receita_total_cidade = sum(receita_total)) |> 
+  arrange(desc(receita_total_cidade))
+
+# Cria a variável categoria_receita
+dados_vendas_limpos |> 
+  mutate (categoria_receita = ifelse(receita > 1000,  "Alta", "Baixa")) |>
+  select (cidade, produto, categoria_receita)
+  
+#Cria a variavel "categoria_receita" com múltiplas categorias
+dados_vendas_limpos |> 
+  mutate ( categoria_receita = case_when (
+    receita > 1000 ~ "Alta",
+    receita > 500 & receita <= 1000 ~ "Média",
+    receita > 0 & receita <= 500 ~ "Baixa",
+    TRUE ~"Sem Receita"
+  )) |> 
+  select(cidade, produto, categoria_receita)
+
+
+# As funções summarise e group_by -----------------------------------------
+
+# calcula a receita média
+dados_vendas_limpos |>
+  summarise(receita_media = mean(receita))
+
+# calcula a receita total
+dados_vendas_limpos |>
+  summarise(receita_total = sum(receita))
+
+# calcula o número de representantes distintos nos dados
+dados_vendas_limpos |>
+  summarise(numero_representantes = n_distinct(representante))
+
+# calcula o número total de vendas realizadas
+dados_vendas_limpos |>
+  summarise(total_vendas = n())
+
+
+# As funções group_by -----------------------------------------------------
+
+# calcula a receita média por cidade
+dados_vendas_limpos |>
+  group_by(cidade) |>
+  summarise(receita_media = mean(receita))
+
+# calcula a receita média por produto
+dados_vendas_limpos |>
+  group_by(produto) |>
+  summarise(receita_media = mean(receita))
+
+# calcula a receita média por cidade e produto
+dados_vendas_limpos |>
+  group_by(cidade, produto) |>
+  summarise(receita_media = mean(receita))
+
+
+# A função arrange --------------------------------------------------------
+
+
+# ordena os dados por receita em ordem crescente
+dados_vendas_limpos |>
+  arrange(receita)
+
+# ordena os dados por receita em ordem decrescente
+dados_vendas_limpos |>
+  arrange(desc(receita))
+
+# ordena a receita média por cidade em ordem crescente
+dados_vendas_limpos |>
+  group_by(cidade) |>
+  summarise(receita_media = mean(receita)) |>
+  arrange(receita_media)
+
+# ordena a receita média por cidade em ordem decrescente
+# salva o resultado em um novo objeto
+receita_media_cidade <-
+  dados_vendas_limpos |>
+  group_by(cidade) |>
+  summarise(receita_media = mean(receita)) |>
+  arrange(desc(receita_media))
+
+# exibe o resultado
+receita_media_cidade
+
+
+
+         
+         
