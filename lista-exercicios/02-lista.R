@@ -10,31 +10,31 @@
 # Configura o número de dígitos a serem exibidos
 options(digits = 5, scipen = 999)
 
-# carrega os pacotes necessários
-
-# 1. Carregar os pacotes necessários
-library(here)
-library(tidyverse) # Nota: O pacote readr é carregado automaticamente com o tidyverse
-library(janitor)
-
-# 2. Importar o arquivo dados-marketing.csv da pasta dados/brutos
-dados_marketing <- read_csv(here("dados", "brutos", "dados-marketing.csv"))
-
-# 3. Executar o glimpse para analisar a estrutura dos dados
-glimpse(dados_marketing)
 
 # Exercicio 1 -------------------------------------------------------------
 
 
 ## a)
 
+# carrega os pacotes necessários
+
+library(here)
+library(tidyverse) # Nota: O pacote readr é carregado automaticamente com o tidyverse
+library(janitor) 
 
 ## b)
+
+#define o caminho para o arquivo csv
+Caminho_csv <- here("dados/bruto/dados-marketing.csv")
+
+#importar os dados e armazenar no objeto dados_marketing
+dados_maketing <- read_csv (caminho_csv, show_col_types = FALSE)
 
 
 ## c)
 
-
+# exiba uma visão geral dos dados
+glimpse(dados_marketing)
 
 # Exercicio 2 -------------------------------------------------------------
 
