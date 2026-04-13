@@ -1,55 +1,52 @@
-# Arquivo: 02-lista.R
-# Autor(a): Thayna Pereira Vieira
-# Data: 06/04/2026
+# Arquivo: 02-lista-solucoes.R
+# Autor(a): Prof. Washington Silva
+# Data: 07/04/26
 # Objetivo:
 # 1. Resolver os exercícios da lista 2
 
 
-# Configurações globais ---------------------------------------------------
+# Configuracoes globais ---------------------------------------------------
 
-# Configura o número de dígitos a serem exibidos
+# Configura o numero de digitos a serem exibidos
 options(digits = 5, scipen = 999)
+
+# carrega os pacotes necessarios
+library(here)
+library(tidyverse)
+library(janitor)
 
 
 # Exercicio 1 -------------------------------------------------------------
 
+## a) os pacotes foram carregados no inicio do script (secao Configuracoes globais)
 
-## a)
-
-# carrega os pacotes necessários
-
-library(here)
-library(tidyverse) # Nota: O pacote readr é carregado automaticamente com o tidyverse
-library(janitor) 
 
 ## b)
 
-#define o caminho para o arquivo csv
-Caminho_csv <- here("dados/bruto/dados-marketing.csv")
+# define o caminho para o arquivo csv
+caminho_csv <- here("dados/brutos/dados-marketing.csv")
 
-#importar os dados e armazenar no objeto dados_marketing
-dados_maketing <- read_csv (caminho_csv, show_col_types = FALSE)
+# importa os dados e armazena no objeto dados_marketing
+dados_marketing <- read_csv(caminho_csv, show_col_types = FALSE)
 
 
 ## c)
 
-# exiba uma visão geral dos dados
+# exibe uma visao geral dos dados
 glimpse(dados_marketing)
+
 
 # Exercicio 2 -------------------------------------------------------------
 
-## a)
-
-##Cada linha (observação) do arquivo representa uma semana de
-##observação da empresa com informações sobre os gastos em diferentes
-##canais de marketing (TV, radio, redes sociais e e-mail), a ocorrência
-##de promoçaao, a atividade da concorrência e a receita de vendas
-##obtida naquela semana.
+## a) Cada linha (observação) do arquivo representa uma semana de
+##    observação da empresa com informações sobre os gastos em diferentes
+##    canais de marketing (TV, radio, redes sociais e e-mail), a ocorrência
+##    de promoçaao, a atividade da concorrência e a receita de vendas
+##    obtida naquela semana.
 
 
-## b)
+## b) o objeto dados_marketing possui 156 observacoes e 9 variaveis
 
-# O objeto dados_marketing possui 156 observacoes e 9 variaveis
 
 # Exercicio 3 -------------------------------------------------------------
 
@@ -59,16 +56,19 @@ glimpse(dados_marketing)
 dados_marketing_limpos <- dados_marketing |>
   clean_names()
 
+
 ## b)
 
 # mostra os nomes das variaveis após a padronização
 names(dados_marketing_limpos)
+
 
 # Exercicio 4 -------------------------------------------------------------
 
 # monta uma versão mais enxuta do resultado
 dados_marketing_limpos |>
   select(data, mes, gasto_tv, gasto_radio, promocao, receita_vendas)
+
 
 # Exercicio 5 -------------------------------------------------------------
 
@@ -84,6 +84,7 @@ dados_marketing_limpos |>
 
 # visualiza o objeto no RStudio
 View(dados_marketing_limpos)
+
 
 # Exercicio 6 -------------------------------------------------------------
 
