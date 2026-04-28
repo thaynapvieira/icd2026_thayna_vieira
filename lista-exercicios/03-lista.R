@@ -12,6 +12,7 @@ options(digits = 5, scipen = 999)
 library(here)
 library(tidyverse)
 
+
 # Exercício 1 ------------------------------------------------
 
 ## a
