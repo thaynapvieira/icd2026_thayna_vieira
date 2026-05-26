@@ -1,9 +1,10 @@
 # Arquivo: 05-probabilidade.R
-# Autor: Joao Silva
+# Autor(a): <seu nome>
 # Data: 11/05/2026
 # Objetivos:
 # 1. Praticar cálculos básicos de probabilidades
 # 2. Praticar conceitos básicos de simulação de Monte Carlo
+
 
 # Configuracoes globais -----------------------------------------------
 
@@ -14,128 +15,105 @@ options(digits = 5, scipen = 999)
 # Pacotes usados ------------------------------------------------------
 
 library(tidyverse)
-library(probs) # instale esse pacote (novo pacote)
+library(probs) # instale esse pacote
 
 
-# Exemplo 1 ---------------------------------------------------------------
+# 1. Probabilidade clássica ---------------------------------------------
+
+# Exemplo: lançar uma moeda equilibrada 3 vezes.
+# A função tosscoin() cria o espaço amostral do experimento.
+espaco_moeda_3 <- tosscoin(times = 3)
+espaco_moeda_3
+
+# Evento A: obter exatamente uma cara.
+# No pacote probs, "H" representa cara (heads) e "T" representa coroa (tails).
+evento_uma_cara <- rowSums(espaco_moeda_3 == "H") == 1
+evento_uma_cara
+
+# Número de resultados favoráveis ao evento A.
+favoraveis_uma_cara <- sum(evento_uma_cara)
+favoraveis_uma_cara
+
+# Número total de resultados possíveis.
+total_resultados_moeda <- nrow(espaco_moeda_3)
+total_resultados_moeda
+
+# Probabilidade clássica: casos favoráveis / casos possíveis.
+prob_uma_cara <- favoraveis_uma_cara / total_resultados_moeda
+prob_uma_cara
 
 
-#Uma moeda é equilibrada se der cara ou coroa com a mesma 
-#probabilidade. Você joga uma moeda equilibrada três vezes. 
-#Qual é a probabilidade de que exatamente um dos lançamentos resulte em cara?
+# 2. Combinações e probabilidade: Mega-Sena -----------------------------
 
-# espaço amostral do lançamento de uma moeda 2 vezes
-tosscoin(times = 3)
+# Na Mega-Sena, uma aposta simples escolhe 6 números entre 60.
+# A função choose(n, k) calcula o número de combinações possíveis.
+total_combinacoes <- choose(60, 6)
+total_combinacoes
 
+# Probabilidade de acertar os 6 números com uma aposta simples.
+prob_megasena <- 1 / total_combinacoes
+prob_megasena
 
-
-# Exemplo 2 ---------------------------------------------------------------
-
-# 6 numeros na mega-sena
-#Qual a probabilidade de escolher os 6 números corretos entre os 60 
-#possíveis fazendo apenas uma aposta.
-
-
-#Em R, a função choose(n, k) calcula o número de combinações possíveis:
-# para exibir os números sem notação científica
-options(scipen = 999)
-
-choose(60,6)
-
-#Assim, a probabilidade de ganhar o prêmio principal da megasena fazendo 
-#uma aposta é 1/50.063.860, ou:
+# A mesma probabilidade em percentual.
+prob_megasena_percentual <- prob_megasena * 100
+prob_megasena_percentual
 
 
-# para exibir os números sem notação científica
-options(scipen = 999)
+# 3. Simulação com sample(): lançamento de dado -------------------------
 
-# prob. de acertar os 6 números da megasena com 1 aposta
-1/choose(60,6)
+# Define os resultados possíveis de um dado equilibrado.
+dado <- 1:6
 
-
-# A função sample() de R --------------------------------------------------
-
-#A função sample() sorteia elementos de um conjunto de forma aleatória. 
-#É a ferramenta básica para simular experimentos aleatórios no computador
-
-#lançamentos de moedas e dados, sorteios, escolhas de clientes, 
-#seleção de unidades em uma auditoria etc.
-
-# fixa a semente para reprodutibilidade
+# Fixa a semente para que a simulação possa ser reproduzida.
 set.seed(123)
 
-# cria um vetor de 1 até 6 (faces do dado)
-dado <- 1:6                                 
+# Número de lançamentos que serão simulados.
+n <- 10
 
-# define o n. de lançamentos do dado
-n <- 10 
+# Simula n lançamentos independentes do dado.
+# replace = TRUE indica que cada face continua disponível no próximo lançamento.
+lancamentos <- sample(
+  x = dado,
+  size = n,
+  replace = TRUE
+)
 
-# simula os 10 lançamentos
-lançamentos <- sample(dado, size = 10, replace = TRUE)
-lançamentos
+# Valores observados nos lançamentos simulados.
+lancamentos
 
-# calcula o valor médio dos 10 lançamentos
-mean(lançamentos)  # média observada
-
-
-# tamanho da amostra = 100 ------------------------------------------------
+# Média observada nos n lançamentos simulados.
+media_lancamentos <- mean(lancamentos)
+media_lancamentos
 
 
-# fixa a semente para reprodutibilidade
+# 4. Lei dos Grandes Números: aumentando n ------------------------------
+
+# Valor esperado teórico de um dado equilibrado.
+valor_esperado_dado <- mean(dado)
+valor_esperado_dado
+
+# Tamanhos de simulação que serão comparados.
+tamanhos_simulacao <- c(100, 1000, 10000, 100000)
+
+# Gera uma sequência longa de lançamentos.
 set.seed(123)
+lancamentos_longos <- sample(
+  x = dado,
+  size = max(tamanhos_simulacao),
+  replace = TRUE
+)
 
-# define o n. de lançamentos do dado
-n <- 100 
+# Calcula a média observada usando os primeiros n lançamentos da sequência.
+resumo_lgn_dado <- tibble(
+  n = tamanhos_simulacao
+) |>
+  mutate(
+    media_observada = map_dbl(
+      n,
+      ~ mean(lancamentos_longos[1:.x])
+    ),
+    valor_esperado_teorico = valor_esperado_dado
+  )
 
-# simula os n lançamentos
-lançamentos <- sample(dado, size = 10, replace = TRUE)
-
-# calcula o valor médio dos 10 lançamentos
-mean(lançamentos)  # média observada
-
-
-# tamanho da amostra = 1.000 ----------------------------------------------
-
-
-# fixa a semente para reprodutibilidade
-set.seed(123)
-
-# define o n. de lançamentos do dado
-n <- 1000 
-
-# simula os n lançamentos
-lançamentos <- sample(dado, size = 10, replace = TRUE)
-
-# calcula o valor médio dos 10 lançamentos
-mean(lançamentos)  # média observada
-
-
-# tamanho da amostra = 10.000 ---------------------------------------------
-
-# fixa a semente para reprodutibilidade
-set.seed(123)
-
-# define o n. de lançamentos do dado
-n <- 10000 
-
-# simula os n lançamentos
-lançamentos <- sample(dado, size = 10, replace = TRUE)
-
-# calcula o valor médio dos 10 lançamentos
-mean(lançamentos)  # média observada
-
-##tamanho da amostra = 100.000
-
-# fixa a semente para reprodutibilidade
-set.seed(123)
-
-# define o n. de lançamentos do dado
-n <- 100000
-
-# simula os n lançamentos
-lançamentos <- sample(dado, size = 10, replace = TRUE)
-
-# calcula o valor médio dos 10 lançamentos
-mean(lançamentos)  # média observada
-
-
+# exibe o resultado
+resumo_lgn_dado
