@@ -93,3 +93,19 @@ dados_marketing |>
   add_histogram(bins = 20)
 
 
+# 5. Valores típicos da receita -------------------------------------------
+
+
+
+# Calcula média e mediana para descrever o centro da distribuição.
+centro_receita <- dados_marketing |>
+  summarize(
+    media = mean(receita_vendas),
+    mediana = median(receita_vendas)
+  )
+
+centro_receita
+
+
+
+
